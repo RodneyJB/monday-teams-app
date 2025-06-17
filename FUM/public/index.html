@@ -1,24 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=375, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monday Teams App</title>
+  <script src="https://statics.teams.cdn.office.net/sdk/v1.13.0/js/MicrosoftTeams.min.js"></script>
   <style>
     body {
-      max-width: 375px;
+      margin: 0;
+      padding: 1em;
+      font-family: Arial, sans-serif;
+      max-width: 480px;
       margin: auto;
-      font-family: sans-serif;
-      background: #f9f9f9;
-      padding: 16px;
-      box-sizing: border-box;
     }
-    h1, p {
-      margin: 0 0 12px;
+    button {
+      padding: 1em;
+      font-size: 1em;
+      width: 100%;
+      background: #0078d4;
+      color: white;
+      border: none;
+      border-radius: 4px;
     }
   </style>
-  <title>Monday Mobile View</title>
 </head>
 <body>
-  <h1>Loading...</h1>
-  <p>If you see this, the page isn't being replaced with user info.</p>
+  <h2>Welcome to Monday Teams App</h2>
+  <p>Please login to continue.</p>
+  <button onclick="startTeamsLogin()">Login with Monday</button>
+
+  <script>
+    function startTeamsLogin() {
+      microsoftTeams.initialize();
+      microsoftTeams.authentication.authenticate({
+        url: window.location.origin + "/auth-popup",
+        width: 600,
+        height: 535,
+        successCallback: function (result) {
+          console.log("✅ Login success", result);
+          location.reload();
+        },
+        failureCallback: function (error) {
+          console.error("❌ Login failed", error);
+          alert("Login failed. Please try again.");
+        }
+      });
+    }
+  </script>
 </body>
 </html>

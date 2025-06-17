@@ -2,21 +2,21 @@
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
   "manifestVersion": "1.16",
   "version": "1.0.0",
-  "id": "your-app-guid-here",
-  "packageName": "com.example.mondayteamsapp",
+  "id": "f79a9b99-6a78-4b65-9b89-c123456789ab",
+  "packageName": "com.yourcompany.mondaymobile",
   "name": {
     "short": "Monday Mobile",
-    "full": "Monday Mobile View in Teams"
+    "full": "Monday.com Teams Mobile View"
   },
   "description": {
-    "short": "Access Monday.com in Teams",
-    "full": "Mobile-style access to your Monday.com account in Microsoft Teams"
+    "short": "Mobile-style Monday.com in Teams",
+    "full": "View Monday.com in Teams with mobile-optimized layout"
   },
   "developer": {
-    "name": "Your Name",
-    "websiteUrl": "https://abc123.ngrok.io",
-    "privacyUrl": "https://abc123.ngrok.io/privacy",
-    "termsOfUseUrl": "https://abc123.ngrok.io/terms"
+    "name": "Rodney Buljubasic",
+    "websiteUrl": "https://monday-teams-app.onrender.com",
+    "privacyUrl": "https://monday-teams-app.onrender.com/privacy",
+    "termsOfUseUrl": "https://monday-teams-app.onrender.com/terms"
   },
   "icons": {
     "color": "color.png",
@@ -25,16 +25,15 @@
   "accentColor": "#00A3E0",
   "staticTabs": [
     {
-      "entityId": "mondayMobileTab",
+      "entityId": "mondayApp",
       "name": "Monday App",
-      "contentUrl": "https://abc123.ngrok.io",
-      "websiteUrl": "https://abc123.ngrok.io",
+      "contentUrl": "https://monday-teams-app.onrender.com",
+      "websiteUrl": "https://monday-teams-app.onrender.com",
       "scopes": ["personal"]
     }
   ],
   "validDomains": [
-    "abc123.ngrok.io",
+    "monday-teams-app.onrender.com",
     "monday.com"
-  ],
-  "supportedPlatform": ["desktop", "mobile"]
+  ]
 }
