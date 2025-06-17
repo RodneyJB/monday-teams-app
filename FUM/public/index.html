@@ -1,86 +1,65 @@
-const express = require('express');
-const session = require('express-session');
-const axios = require('axios');
-const path = require('path');
-
-const app = express();
-const PORT = process.env.PORT || 5000;
-
-const clientId = '53b916a33737930db9de0faa9718b881';
-const clientSecret = '78973e7f1274e56626158c1ec3853838';
-const redirectUri = 'https://monday-teams-app.onrender.com/oauth/callback';
-
-app.use(session({
-  secret: 'your_secret',
-  resave: false,
-  saveUninitialized: true
-}));
-
-app.use(express.static(path.join(__dirname, '../public')));
-
-app.get('/login', (req, res) => {
-  const url = `https://auth.monday.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}`;
-  res.redirect(url);
-});
-
-app.get('/auth-popup', (req, res) => {
-  const state = 'teams';
-  const url = `https://auth.monday.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}`;
-  res.send(`<script>window.location.href='${url}'</script>`);
-});
-
-app.get('/oauth/callback', async (req, res) => {
-  const code = req.query.code;
-  const state = req.query.state;
-
-  try {
-    const tokenRes = await axios.post('https://auth.monday.com/oauth2/token', {
-      client_id: clientId,
-      client_secret: clientSecret,
-      code,
-      redirect_uri: redirectUri
-    });
-
-    const accessToken = tokenRes.data.access_token;
-    req.session.token = accessToken;
-    console.log('✅ Access token saved:', accessToken);
-
-    if (state === 'teams') {
-      res.send(`
-        <script>
-          sessionStorage.setItem('monday_token', '${accessToken}');
-          window.opener.microsoftTeams.authentication.notifySuccess('success');
-          window.close();
-        </script>
-      `);
-    } else {
-      res.redirect('/');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monday Teams App</title>
+  <script src="https://statics.teams.cdn.office.net/sdk/v1.12.0/js/MicrosoftTeams.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2em;
+      margin: 0;
+      height: 100vh;
+      background: #f4f4f4;
+      text-align: center;
     }
-  } catch (err) {
-    console.error('❌ Error exchanging token:', err.response?.data || err.message);
-    res.status(500).send('OAuth error');
-  }
-});
+    button {
+      padding: 1em 2em;
+      background-color: #0078d4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    button:hover {
+      background-color: #005a9e;
+    }
+  </style>
+</head>
+<body>
+  <h2>Welcome to Monday Teams App</h2>
+  <p>Please login to continue.</p>
+  <button onclick="loginWithMonday()">Login with Monday</button>
 
-app.get('/me', async (req, res) => {
-  const token = req.session?.token;
-  if (!token) return res.status(401).json({ error: 'Not authenticated' });
-
-  try {
-    const query = { query: `query { me { name email time_zone_identifier } }` };
-    const result = await axios.post('https://api.monday.com/v2', query, {
-      headers: {
-        Authorization: token,
-        'Content-Type': 'application/json'
+  <script>
+    async function loginWithMonday() {
+      const token = sessionStorage.getItem('monday_token');
+      if (token) {
+        console.log('✅ Already authenticated.');
+        window.location.href = '/';
+        return;
       }
-    });
-    res.json(result.data.data.me);
-  } catch (err) {
-    console.error('❌ Error fetching user info:', err.response?.data || err.message);
-    res.status(500).json({ error: 'Failed to fetch user info' });
-  }
-});
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
-});
+      microsoftTeams.initialize();
+      microsoftTeams.authentication.authenticate({
+        url: window.location.origin + "/auth-popup",
+        width: 600,
+        height: 535,
+        successCallback: function () {
+          console.log('✅ Login success');
+          window.location.reload();
+        },
+        failureCallback: function (err) {
+          console.error('❌ Login failed:', err);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
